@@ -1,0 +1,89 @@
+import random
+
+
+puntajes = []
+
+def generar_numero_secreto(rango):
+    return random.randint(rango[0], rango[1])
+
+def mostrar_mensaje_bienvenida(nivel, rango):
+    print(f"Bienvenido al juego de adivinanza nivel {nivel}.\n")
+    print(f"Adivina un número entre {rango[0]} y {rango[1]}.\n")
+
+def realizar_intentos(numero_secreto, intentos_maximos):
+    intentos = 0
+
+    while intentos < intentos_maximos:
+        intento_usuario = input("Ingresa tu intento: ")
+
+        if not intento_usuario.isdigit():
+            print("Ingresa un número válido.")
+            continue
+
+        intento_usuario = int(intento_usuario)
+        intentos += 1
+
+        if intento_usuario == numero_secreto:
+            print(f"¡Felicidades! ¡Has adivinado el número en {intentos} intentos!\n")
+            registrar_puntuacion(intentos)
+            return True
+        elif intento_usuario < numero_secreto:
+            print("El número es mayor. Intenta nuevamente.")
+        else:
+            print("El número es menor. Intenta nuevamente.")
+
+    print(f"\n¡Agotaste tus {intentos_maximos} intentos! El número secreto era {numero_secreto}.")
+    registrar_puntuacion(0)  # Register a score of 0 for unsuccessful attempts
+    return False
+
+def registrar_puntuacion(puntuacion):
+    puntajes.append(puntuacion)
+    print(f"Tu puntuación ha sido registrada: {puntuacion} intentos.\n")
+
+def mostrar_puntajes():
+    if puntajes:
+        print("Puntuaciones registradas:")
+        for i, puntuacion in enumerate(puntajes, start=1):
+            print(f"{i}. {puntuacion} intentos.")
+    else:
+        print("Aún no hay puntuaciones registradas.\n")
+
+def seleccionar_nivel():
+    niveles = {
+        'simple': (0, 100),
+        'intermedio': (0, 1000),
+        'avanzado': (0, 1000000),
+        'experto': (0, 1000000000000)
+    }
+
+    print("Selecciona un nivel de dificultad:")
+    for i, nivel in enumerate(niveles, start=1):
+        print(f"{i}. Nivel {nivel.capitalize()} (entre {niveles[nivel][0]} y {niveles[nivel][1]})")
+
+    seleccion = input("Ingresa el número del nivel: ")
+
+    if seleccion.isdigit() and 1 <= int(seleccion) <= len(niveles):
+        return list(niveles.keys())[int(seleccion) - 1], niveles[list(niveles.keys())[int(seleccion) - 1]]
+    else:
+        print("Selección no válida. Por favor, elige un número del 1 al {}.".format(len(niveles)))
+        return None, None
+
+def main():
+    while True:
+        nivel, rango = seleccionar_nivel()
+
+        if nivel and rango:
+            intentos_maximos = 10
+            numero_secreto = generar_numero_secreto(rango)
+            mostrar_mensaje_bienvenida(nivel, rango)
+            exito = realizar_intentos(numero_secreto, intentos_maximos)
+
+            if exito:
+                mostrar_puntajes()
+
+        jugar_nuevamente = input("¿Quieres jugar nuevamente? (s/n): ").lower()
+        if jugar_nuevamente != 's':
+            break
+
+if __name__ == "__main__":
+    main()
